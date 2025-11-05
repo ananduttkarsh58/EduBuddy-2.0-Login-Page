@@ -12,6 +12,11 @@ export default function LoginForm({
   loading 
 }) {
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false) // ✅ added
+
+  const handleLoginClick = () => {
+    onLogin(rememberMe) // ✅ pass rememberMe state to parent
+  }
 
   return (
     <div>
@@ -61,10 +66,13 @@ export default function LoginForm({
           </div>
         </div>
 
+        {/* ✅ Remember Me + Forgot Password */}
         <div className="flex justify-between items-center mb-6 text-sm">
           <label className="flex items-center text-white cursor-pointer">
             <input
               type="checkbox"
+              checked={rememberMe}
+              onChange={() => setRememberMe(!rememberMe)}
               className="mr-2 w-4 h-4 cursor-pointer"
               disabled={loading}
             />
@@ -79,8 +87,9 @@ export default function LoginForm({
           </button>
         </div>
 
+        {/* ✅ Pass rememberMe on login */}
         <button
-          onClick={onLogin}
+          onClick={handleLoginClick}
           disabled={loading}
           className="w-full bg-white text-purple-700 font-semibold py-3 px-6 rounded-full hover:bg-gray-100 transition duration-200 mb-5 disabled:opacity-50 disabled:cursor-not-allowed"
         >

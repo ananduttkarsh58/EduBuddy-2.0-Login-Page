@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { authAPI } from '../../services/api'  // ← Fixed: Changed from ../services/api to ../../services/api
+import { authAPI } from '../../services/api'
 
 export default function ForgotPasswordModal({ isOpen, onClose }) {
   const [resetEmail, setResetEmail] = useState('')
@@ -13,20 +13,26 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
       alert('Please enter your email address')
       return
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(resetEmail)) {
       alert('Please enter a valid email address')
       return
     }
-    
+
     setLoading(true)
     try {
       const response = await authAPI.forgotPassword(resetEmail)
       console.log('Password reset link sent:', response)
       setEmailSent(true)
     } catch (error) {
-      alert(error.message || 'Failed to send reset link. Please try again.')
+      if (error.message === 'Failed to fetch') {
+        // 🌐 Frontend-only simulation
+        alert('Backend not connected — simulated reset link sent successfully!')
+        setEmailSent(true)
+      } else {
+        alert(error.message || 'Failed to send reset link. Please try again.')
+      }
     } finally {
       setLoading(false)
     }
@@ -47,7 +53,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
             <p className="text-gray-300 text-sm mb-4">
               Enter your email address to receive a password reset link
             </p>
-            
+
             <input
               type="email"
               value={resetEmail}
@@ -56,12 +62,10 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
               className="w-full px-4 py-3 mb-4 bg-white bg-opacity-10 backdrop-blur-sm border border-white border-opacity-30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 transition"
               disabled={loading}
               onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleSendResetLink()
-                }
+                if (e.key === 'Enter') handleSendResetLink()
               }}
             />
-            
+
             <div className="flex gap-3">
               <button
                 onClick={handleCancel}
@@ -85,13 +89,14 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
               <div className="text-5xl mb-3">✅</div>
               <h3 className="text-xl font-bold text-white mb-2">Email Sent!</h3>
               <p className="text-gray-300 text-sm">
-                We've sent a password reset link to <span className="font-semibold text-white">{resetEmail}</span>
+                We've sent a password reset link to{' '}
+                <span className="font-semibold text-white">{resetEmail}</span>
               </p>
               <p className="text-gray-400 text-xs mt-2">
                 Check your inbox and click the link to reset your password.
               </p>
             </div>
-            
+
             <button
               onClick={handleCancel}
               className="w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition duration-200 font-semibold"

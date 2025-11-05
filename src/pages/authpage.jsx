@@ -33,8 +33,8 @@ export default function AuthPage() {
     })
   }
 
-  // Login handler
-  const handleLogin = async () => {
+  // ✅ Login handler with Remember Me logic
+  const handleLogin = async (rememberMe) => {
     setLoading(true)
     try {
       const response = await authAPI.login({
@@ -44,6 +44,16 @@ export default function AuthPage() {
       })
 
       console.log('Login successful:', response)
+
+      // ✅ Store token (simulated now, real later)
+      const token = response?.token || 'fake-token-12345'
+
+      if (rememberMe) {
+        localStorage.setItem('authToken', token)
+      } else {
+        sessionStorage.setItem('authToken', token)
+      }
+
       alert(`Login successful! Welcome ${response.user?.username || 'User'}`)
     } catch (error) {
       if (error.message === 'Failed to fetch') {
@@ -214,7 +224,7 @@ export default function AuthPage() {
                 selectedRole={selectedRole}
                 formData={formData}
                 onInputChange={handleInputChange}
-                onLogin={handleLogin}
+                onLogin={handleLogin} // ✅ now accepts rememberMe
                 onSignupClick={() => setCurrentView('signup')}
                 onForgotPassword={handleForgotPassword}
                 onBack={resetToRoleSelection}
